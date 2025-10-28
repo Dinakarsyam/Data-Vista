@@ -1,29 +1,20 @@
-# -*- encoding: utf-8 -*-
-"""
-Copyright (c) 2019 - present AppSeed.us
-"""
-
 import os
 from flask_migrate import Migrate
 from flask_minify import Minify
 from sys import exit
 from dotenv import load_dotenv
 
-from apps import create_app, db
+from apps.app import create_app
+from apps import db
 from apps.config import config_dict
 import logging
 
-# Load environment variables from .env file
 load_dotenv()
 
-# WARNING: Don't run with debug turned on in production!
 DEBUG = (os.getenv('DEBUG', 'False') == 'True')
-
-# The configuration
 get_config_mode = 'Debug' if DEBUG else 'Production'
 
 try:
-    # Load the configuration using the default values
     app_config = config_dict[get_config_mode.capitalize()]
 except KeyError:
     exit('Error: Invalid <config_mode>. Expected values [Debug, Production] ')
@@ -44,9 +35,8 @@ if DEBUG:
     app.logger.info("Flask app is running and endpoints should be accessible.")
 
 if __name__ == "__main__":
-    logger.debug(f"Database URI: {app.config['SQLALCHEMY_DATABASE_URI']}")
-    logger.debug("Initializing database...")
     with app.app_context():
-        db.create_all()
-    logger.debug("Database initialized.")
+        # db.create_all() # This is commented out to prevent accidental table creation.
+        # It's better to use Flask-Migrate for database schema management.
+        pass
     app.run(debug=True)

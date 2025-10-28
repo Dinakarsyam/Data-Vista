@@ -1,65 +1,44 @@
-from sqlalchemy import create_engine, Column, Integer, String, Float, Date, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
-import os
-from dotenv import load_dotenv
-from urllib.parse import quote_plus
+from apps import db
 
-load_dotenv()
-
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD"))
-DB_HOST = os.getenv("DB_HOST")
-DB_NAME = os.getenv("DB_NAME")
-
-DATABASE_URI = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}'
-
-Base = declarative_base()
-
-class Store(Base):
+class Store(db.Model):
     __tablename__ = 'stores'
-    storeid = Column(Integer, primary_key=True)
-    storelocation = Column(String)
-    orders = relationship("Order", back_populates="store")
+    storeid = db.Column(db.Integer, primary_key=True)
+    storelocation = db.Column(db.String)
+    orders = db.relationship("Order", back_populates="store")
 
-class Product(Base):
+class Product(db.Model):
     __tablename__ = 'products'
-    productid = Column(Integer, primary_key=True)
-    productname = Column(String)
-    category = Column(String)
-    subcategory = Column(String)
-    orders = relationship("Order", back_populates="product")
+    productid = db.Column(db.Integer, primary_key=True)
+    productname = db.Column(db.String)
+    category = db.Column(db.String)
+    subcategory = db.Column(db.String)
+    orders = db.relationship("Order", back_populates="product")
 
-class SalesTeam(Base):
+class SalesTeam(db.Model):
     __tablename__ = 'salesteam'
-    salespersonid = Column(Integer, primary_key=True)
-    salespersonname = Column(String)
-    orders = relationship("Order", back_populates="salesperson")
+    salespersonid = db.Column(db.Integer, primary_key=True)
+    salespersonname = db.Column(db.String)
+    orders = db.relationship("Order", back_populates="salesperson")
 
-class Order(Base):
+class Order(db.Model):
     __tablename__ = 'orders'
-    orderid = Column(Integer, primary_key=True)
-    orderdate = Column(Date)
-    storeid = Column(Integer, ForeignKey('stores.storeid'))
-    productid = Column(Integer, ForeignKey('products.productid'))
-    salespersonid = Column(Integer, ForeignKey('salesteam.salespersonid'))
-    orderstatus = Column(String)
-    profit = Column(Float)
-    quantity = Column(Integer)
-    costofgoodssold = Column(Float)
-    paymentmethod = Column(String)
-    totalprice = Column(Float)
-    shippingcost = Column(Float)
-    discount = Column(Float)
-    customerfeedback = Column(String)
-    deliverydate = Column(Date)
-    unitprice = Column(Float)
+    orderid = db.Column(db.Integer, primary_key=True)
+    orderdate = db.Column(db.Date)
+    storeid = db.Column(db.Integer, db.ForeignKey('stores.storeid'))
+    productid = db.Column(db.Integer, db.ForeignKey('products.productid'))
+    salespersonid = db.Column(db.Integer, db.ForeignKey('salesteam.salespersonid'))
+    orderstatus = db.Column(db.String)
+    profit = db.Column(db.Float)
+    quantity = db.Column(db.Integer)
+    costofgoodssold = db.Column(db.Float)
+    paymentmethod = db.Column(db.String)
+    totalprice = db.Column(db.Float)
+    shippingcost = db.Column(db.Float)
+    discount = db.Column(db.Float)
+    customerfeedback = db.Column(db.String)
+    deliverydate = db.Column(db.Date)
+    unitprice = db.Column(db.Float)
 
-    store = relationship("Store", back_populates="orders")
-    product = relationship("Product", back_populates="orders")
-    salesperson = relationship("SalesTeam", back_populates="orders")
-
-engine = create_engine(DATABASE_URI)
-Base.metadata.create_all(engine)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+    store = db.relationship("Store", back_populates="orders")
+    product = db.relationship("Product", back_populates="orders")
+    salesperson = db.relationship("SalesTeam", back_populates="orders")
